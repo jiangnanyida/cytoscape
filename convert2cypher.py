@@ -31,11 +31,11 @@ def create_relation(nid,relation,attr,attr_val,tid):
     return sp
 
 def ref(a):
-
-    a = a.replace(' ','__').replace('-','_').replace('.','_').replace('/','_').replace(':','_')
-    a = a.replace('(','').replace(')','').replace('\'','').replace('\"','').replace(',','_')
-    a = a.replace('*','').replace('@','').replace('#','').replace('+','').replace('&','').replace('%','')
-    return a.replace('!','').replace('^','').replace('$','').replace(';',' ')
+    a = re.sub(r'\\|@|#|\$|%|\^|&|\*|\+|\.|!|/|,|\[|\]', '', a)
+    a = re.sub(r' |\(|\)|-|;|:|\'|\"', '_', a)
+    return a
 def sref(a):
-    a = a.replace('\'',' ').replace('\"',' ').replace('(',' ').replace(')',' ')
-    return a.replace(',',' ').replace('*','').replace('@','').replace('#','').replace('+','').replace('^','').replace('$','').replace('&','').replace('%','').replace(';',' ')
+    a = re.sub(r'\\||@|#|\$|%|\^|&|\*|\+','',a)
+    a = re.sub(r' |\|\)|-|\'|\"','_',a)
+    a = re.sub(r':|;|,|\.|/|\\',' ',a)
+    return a

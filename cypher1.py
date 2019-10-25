@@ -26,15 +26,18 @@ has_vendor = 'has_vendor'
 has_infection = 'has_infection'
 
 path = '/Users/huangyida/Desktop/大四上/row data/'
-v = open(path+'newvul.csv','r')
+v = open(path+'newvul1.csv','r')
 vulf = csv.reader(v)
-i = open(path+'newinf.csv','r')
+i = open(path+'newinf1.csv','r')
 inff = csv.reader(i)
-f = open(path+'result.txt','w')
+f = open(path+'result1.txt','w')
 
 cve_dup = []
 link_dup = []
+cvss_dup = 0
+vul_name_dup = []
 for line in vulf:
+    cvss_dup += 1
     vul_id = 'vul_'+str(line[0])
     vul_name = str(line[1])
     cve_name = str(line[2])
@@ -48,19 +51,23 @@ for line in vulf:
     f.writelines(create_relation(vul_id,vul_from_link,[],[],ref(link)))
     #cve_entity
     if cve_name:
-        f.writelines(create_node(ref(cve_name),cve_entity,['cve_node'],[cve_name]))
+        if cve_name not in cve_dup:
+            f.writelines(create_node(ref(cve_name),cve_entity,['cve_node'],[cve_name]))
         # vul has_cve cve
         f.writelines(create_relation(vul_id, vul_has_cve, [], [], ref(cve_name)))
         #cvss node
         if cvss:
-            f.writelines(create_node('cvss'+ref(cvss),cvss_node,['cvss_node'],['cvss'+cvss]))
-            f.writelines(create_relation(ref(cve_name),cve_has_cvss,[],[],'cvss'+ref(cvss)))
+            f.writelines(create_node('cvss'+str(cvss_dup)+ref(cvss),cvss_node,['cvss_node'],['cvss'+cvss]))
+            f.writelines(create_relation(ref(cve_name),cve_has_cvss,[],[],'cvss'+str(cvss_dup)+ref(cvss)))
     #vul_name_node
-    f.writelines(create_node(ref('vul_'+vul_name),vul_name_node,['name'],[sref(vul_name)]))
-
+    if ref(vul_name) not in vul_name_dup:
+        f.writelines(create_node(ref('vul_'+vul_name),vul_name_node,['name'],[sref(vul_name)]))
     #vul has_vul_name
     f.writelines(create_relation(vul_id,vul_has_name,[],[],ref('vul_'+vul_name)))
+
     link_dup.append(link)
+    vul_name_dup.append(ref(vul_name))
+    cve_dup.append(cve_name)
 dev_dup = []
 vendor_dup = []
 for line in inff:
